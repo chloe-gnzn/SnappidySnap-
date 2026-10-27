@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Snappidy Snap — Online Photo Booth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+
+<div class="machine" id="machine">
+
+  <!-- progress strip -->
+  <div class="progress-strip" id="progressStrip">
+    <div class="progress-step" data-step="0"><span class="dot"></span>Frame</div>
+    <div class="progress-step" data-step="1"><span class="dot"></span>Pose</div>
+    <div class="progress-step" data-step="2"><span class="dot"></span>Stickers</div>
+    <div class="progress-step" data-step="3"><span class="dot"></span>Print</div>
+  </div>
+
+  <div class="screen-window">
+
+    <!-- HOME -->
+    <section class="screen active" id="screen-home">
+      <div class="lens">
+        <div class="lens-ring r3"></div>
+        <div class="lens-ring r2"></div>
+        <div class="lens-ring r1"></div>
+        <div class="lens-glint"></div>
+      </div>
+      <h1 class="brand">SNAPPIDYSNAP!</h1>
+      <p class="tagline">Strike a pose, pick a frame, sticker it up — then watch your strip print itself.</p>
+
+      <button class="shutter-btn" id="btnStart" aria-label="Start">
+        <span class="shutter-ring"></span>
+        <span class="shutter-core"></span>
+      </button>
+      <p class="shutter-label">press to start</p>
+
+      <ol class="howto">
+        <li><span class="howto-num">01</span>Choose a frame</li>
+        <li><span class="howto-num">02</span>Strike three poses</li>
+        <li><span class="howto-num">03</span>Decorate with stickers</li>
+        <li><span class="howto-num">04</span>Peel your strip off the printer</li>
+      </ol>
+    </section>
+
+    <!-- FRAMES -->
+    <section class="screen" id="screen-frames">
+      <h2 class="screen-title">Pick your frame</h2>
+      <p class="screen-sub">This sets the mood for your whole strip.</p>
+      <div class="frame-grid" id="frameGrid"></div>
+      <div class="action-row">
+        <button class="btn btn-ghost" id="btnFramesBack">&larr; Home</button>
+        <button class="btn btn-primary" id="btnFramesNext" disabled>Next: Strike a pose &rarr;</button>
+      </div>
+    </section>
+
+    <!-- CAPTURE -->
+    <section class="screen" id="screen-capture">
+      <h2 class="screen-title">Strike a pose</h2>
+      <p class="screen-sub" id="captureSub">We'll snap 3 photos, one at a time. Get ready!</p>
+
+      <div class="capture-stage">
+        <div class="viewfinder">
+          <video id="camVideo" autoplay muted playsinline></video>
+          <div class="flash-overlay" id="flashOverlay"></div>
+          <div class="countdown-num" id="countdownNum"></div>
+          <div class="cam-error" id="camError" hidden>
+            <p>Camera access is needed to take your photos.</p>
+            <p class="cam-error-sub">Allow camera permissions in your browser, then try again.</p>
+            <button class="btn btn-primary" id="btnRetryCam">Try again</button>
+          </div>
+        </div>
+        <div class="thumb-rail" id="thumbRail">
+          <div class="thumb-slot" data-slot="0"></div>
+          <div class="thumb-slot" data-slot="1"></div>
+          <div class="thumb-slot" data-slot="2"></div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-ghost" id="btnCaptureBack">&larr; Frames</button>
+        <button class="btn btn-primary" id="btnCaptureStart">Start countdown</button>
+      </div>
+    </section>
+
+    <!-- REVIEW -->
+    <section class="screen" id="screen-review">
+      <h2 class="screen-title">Love it?</h2>
+      <p class="screen-sub">Keep these shots or take the strip again from scratch.</p>
+      <div class="strip-preview-wrap">
+        <canvas id="reviewCanvas" width="360" height="882"></canvas>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-ghost" id="btnRetake">&larr; Retake (new frame)</button>
+        <button class="btn btn-primary" id="btnToStickers">Add stickers &rarr;</button>
+      </div>
+    </section>
+
+    <!-- STICKERS -->
+    <section class="screen" id="screen-stickers">
+      <h2 class="screen-title">Decorate your strip</h2>
+      <p class="screen-sub">Tap a sticker to add it. Drag to move, pull the corner to resize, tap × to remove.</p>
+
+      <div class="sticker-workspace">
+        <div class="sticker-sheet">
+          <div class="sticker-sheet-title">Sticker sheet</div>
+          <div class="sticker-grid" id="stickerGrid"></div>
+        </div>
+
+        <div class="stage-container" id="stageContainer">
+          <div class="stage-wrap" id="stageWrap">
+            <canvas id="stickerBaseCanvas" width="360" height="882"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-ghost" id="btnStickersBack">&larr; Retake</button>
+        <button class="btn btn-primary" id="btnPrintIt">Print it! &rarr;</button>
+      </div>
+    </section>
+
+    <!-- PRINT TRANSITION -->
+    <section class="screen" id="screen-print">
+      <h2 class="screen-title">Printing your strip&hellip;</h2>
+      <p class="screen-sub" id="printSub">Hang tight, it's coming out now.</p>
+
+      <div class="printer-machine" id="printerMachine">
+        <div class="printer-body">
+            <div class="printer-light" id="printerLight"></div>
+        </div>
+
+        <div class="print-output-wrap" id="printOutputWrap">
+            <img id="printOutputImg" alt="Your printed photo strip">
+        </div>
+
+        <div class="printer-slot-front">
+            <div class="printer-roller roller-left"></div>
+            <div class="printer-roller roller-right"></div>
+            <div class="printer-slot"></div>
+        </div>
+        </div>
+    </section>
+
+    <!-- DISPLAY -->
+    <section class="screen" id="screen-display">
+      <h2 class="screen-title">Fresh off the printer</h2>
+      <p class="screen-sub">Save it before it fades into your camera roll of memories.</p>
+      <div class="final-frame">
+        <img id="displayImg" alt="Your finished photo strip">
+      </div>
+      <div class="action-row">
+        <button class="btn btn-ghost" id="btnStartOver">Start over</button>
+        <button class="btn btn-primary" id="btnSave">Save to downloads</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<canvas id="finalCanvas" width="360" height="882" hidden></canvas>
+
+<script src="script.js?v=4"></script>
+</body>
+</html>
